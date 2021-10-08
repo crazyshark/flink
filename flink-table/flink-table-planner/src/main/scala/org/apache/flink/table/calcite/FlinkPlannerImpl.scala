@@ -86,6 +86,8 @@ class FlinkPlannerImpl(
     */
   def getOrCreateSqlValidator(): FlinkCalciteSqlValidator = {
     if (validator == null) {
+      //如果validator为空则创建
+      //获取catalogReader，catalogReader是在plannercontext中定义的
       val catalogReader = catalogReaderSupplier.apply(false)
       validator = createSqlValidator(catalogReader)
     }
@@ -93,6 +95,7 @@ class FlinkPlannerImpl(
   }
 
   private def createSqlValidator(catalogReader: CatalogReader) = {
+    //FlinkCalciteSqlValidator需要的参数大部分都是在plannercontext中定义
     val validator = new FlinkCalciteSqlValidator(
       operatorTable,
       catalogReader,
@@ -166,6 +169,7 @@ class FlinkPlannerImpl(
         cluster,
         convertletTable,
         sqlToRelConverterConfig)
+      //将query的sqlnode转换为relnode
       sqlToRelConverter.convertQuery(validatedSqlNode, false, true)
       // we disable automatic flattening in order to let composite types pass without modification
       // we might enable it again once Calcite has better support for structured types

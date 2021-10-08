@@ -148,7 +148,10 @@ public class SqlToOperationConverter {
      */
     public static Optional<Operation> convert(
             FlinkPlannerImpl flinkPlanner, CatalogManager catalogManager, SqlNode sqlNode) {
+        //这里将parser后的sqlnode在validate后通过calcite的SqlToRelConverter转换成对应的relnode，
+        //之后将relnode包装成Operation并返回
         // validate the query
+        //首先validate sqlnode
         final SqlNode validated = flinkPlanner.validate(sqlNode);
         SqlToOperationConverter converter =
                 new SqlToOperationConverter(flinkPlanner, catalogManager);
@@ -721,6 +724,7 @@ public class SqlToOperationConverter {
 
     private PlannerQueryOperation toQueryOperation(FlinkPlannerImpl planner, SqlNode validated) {
         // transform to a relational tree
+        //将sqlnode转换为relnode
         RelRoot relational = planner.rel(validated);
         return new PlannerQueryOperation(relational.rel);
     }
