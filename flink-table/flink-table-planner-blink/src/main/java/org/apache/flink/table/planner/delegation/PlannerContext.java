@@ -112,14 +112,16 @@ public class PlannerContext {
         // Make a framework config to initialize the RelOptCluster instance,
         // caution that we can only use the attributes that can not be overwrite/configured
         // by user.
+        //进行框架配置以初始化 RelOptCluster 实例，注意我们只能使用用户无法覆盖/配置的属性。
         this.frameworkConfig = createFrameworkConfig();
-
+        //获取planner
         RelOptPlanner planner =
                 new VolcanoPlanner(frameworkConfig.getCostFactory(), frameworkConfig.getContext());
         planner.setExecutor(frameworkConfig.getExecutor());
         for (RelTraitDef traitDef : frameworkConfig.getTraitDefs()) {
             planner.addRelTraitDef(traitDef);
         }
+        //获取RelOptCluster，包含了优化过程中需要的上下文环境信息
         this.cluster = FlinkRelOptClusterFactory.create(planner, new FlinkRexBuilder(typeFactory));
     }
 
