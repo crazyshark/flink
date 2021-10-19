@@ -162,7 +162,8 @@ class FlinkPlannerImpl(
       assert(validatedSqlNode != null)
       val sqlToRelConverter: SqlToRelConverter = createSqlToRelConverter(sqlValidator)
 
-      sqlToRelConverter.convertQuery(validatedSqlNode, false, true)
+      val select = sqlToRelConverter.convertQuery(validatedSqlNode, false, true)
+      select
       // we disable automatic flattening in order to let composite types pass without modification
       // we might enable it again once Calcite has better support for structured types
       // root = root.withRel(sqlToRelConverter.flattenTypes(root.rel, true))

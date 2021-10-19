@@ -83,6 +83,7 @@ public class JsonRowDataDeserializationSchema implements DeserializationSchema<R
         this.resultTypeInfo = checkNotNull(resultTypeInfo);
         this.failOnMissingField = failOnMissingField;
         this.ignoreParseErrors = ignoreParseErrors;
+        //这里的converter用来将JsonNode转换为flink sql内部数据
         this.runtimeConverter =
                 new JsonToRowDataConverters(failOnMissingField, ignoreParseErrors, timestampFormat)
                         .createConverter(checkNotNull(rowType));
@@ -100,7 +101,9 @@ public class JsonRowDataDeserializationSchema implements DeserializationSchema<R
             return null;
         }
         try {
+            //获取数据对应的JsonNode
             final JsonNode root = objectMapper.readTree(message);
+            //将JsonNode转换为flink sql内部数据
             return (RowData) runtimeConverter.convert(root);
         } catch (Throwable t) {
             if (ignoreParseErrors) {

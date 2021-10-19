@@ -32,6 +32,7 @@ import org.apache.calcite.rel.{RelCollation, RelCollationTraitDef, RelCollations
 
 /**
   * Rule which converts an [[AbstractConverter]] to a RelNode which satisfies the target traits.
+ * 将 [[AbstractConverter]] 转换为满足目标特征的 RelNode 的规则。
   */
 class FlinkExpandConversionRule(flinkConvention: Convention)
   extends RelOptRule(
@@ -52,8 +53,10 @@ class FlinkExpandConversionRule(flinkConvention: Convention)
     val child: RelNode = call.rel(1)
     val toTraitSet = converter.getTraitSet
     // try to satisfy required trait by itself.
+    //尝试自己满足所需的特征。
     satisfyTraitsBySelf(child, toTraitSet, call)
     // try to push down required traits to children.
+    //尝试将所需的特征下放到孩子节点上。
     satisfyTraitsByInput(child, toTraitSet, call)
   }
 

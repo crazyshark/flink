@@ -64,6 +64,7 @@ public class CopyOnWriteStateTableSnapshot<K, N, S> extends AbstractStateTableSn
                 stateSnapshotTransformer);
 
         this.keyGroupOffset = owningStateTable.getKeyGroupOffset();
+        //获取CopyOnWriteStateTable中所有CopyOnWriteStateMap的CopyOnWriteStateMapSnapshot
         this.stateMapSnapshots = owningStateTable.getStateMapSnapshotList();
     }
 
@@ -73,6 +74,7 @@ public class CopyOnWriteStateTableSnapshot<K, N, S> extends AbstractStateTableSn
         int indexOffset = keyGroup - keyGroupOffset;
         CopyOnWriteStateMapSnapshot<K, N, S> stateMapSnapshot = null;
         if (indexOffset >= 0 && indexOffset < stateMapSnapshots.size()) {
+            //获取对应keyGroup对应的CopyOnWriteStateMap的CopyOnWriteStateMapSnapshot
             stateMapSnapshot = stateMapSnapshots.get(indexOffset);
         }
 

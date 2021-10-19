@@ -201,6 +201,8 @@ class HeapSnapshotStrategy<K> extends AbstractSnapshotStrategy<KeyedStateHandle>
                                             new DataOutputViewStreamWrapper(kgCompressionOut);
                                     kgCompressionView.writeShort(
                                             stateNamesToId.get(stateSnapshot.getKey()));
+                                    //通过CopyOnWriteStateTableSnapshot将CopyOnWriteStateTable中的state
+                                    //进行snapshot
                                     partitionedSnapshot.writeStateInKeyGroup(
                                             kgCompressionView, keyGroupId);
                                 } // this will just close the outer compression stream
@@ -275,6 +277,7 @@ class HeapSnapshotStrategy<K> extends AbstractSnapshotStrategy<KeyedStateHandle>
             stateNamesToId.put(stateUid, stateNamesToId.size());
             StateSnapshotRestore state = kvState.getValue();
             if (null != state) {
+                //从CopyOnWriteStateTable中获取CopyOnWriteStateTableSnapshot
                 final StateSnapshot stateSnapshot = state.stateSnapshot();
                 metaInfoSnapshots.add(stateSnapshot.getMetaInfoSnapshot());
                 cowStateStableSnapshots.put(stateUid, stateSnapshot);

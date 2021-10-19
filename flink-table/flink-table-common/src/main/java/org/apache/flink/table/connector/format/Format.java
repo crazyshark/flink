@@ -27,18 +27,23 @@ import org.apache.flink.table.factories.DynamicTableFactory;
 
 /**
  * Base interface for connector formats.
+ * 连接器格式的基本接口。
  *
  * <p>Depending on the kind of external system, a connector might support different encodings for
  * reading and writing rows. This interface is an intermediate representation before constructing
  * actual runtime implementation.
+ * 根据外部系统的类型，连接器可能支持不同的读取和写入行编码。 此接口是构建实际运行时实现之前的中间表示。
  *
  * <p>Formats can be distinguished along two dimensions:
+ * 可以从两个维度区分格式：
  *
  * <ul>
  *   <li>Context in which the format is applied ({@link DynamicTableSource} or {@link
  *       DynamicTableSink}).
+ *       应用格式的上下文（{@link DynamicTableSource} 或 {@link DynamicTableSink}）。
  *   <li>Runtime implementation interface that is required (e.g. {@link DeserializationSchema} or
  *       some bulk interface).
+ *       所需的运行时实现接口（例如{@link DeserializationSchema} 或一些批量接口）。
  * </ul>
  *
  * <p>A {@link DynamicTableFactory} can search for a format that it is accepted by the connector.
