@@ -58,7 +58,7 @@ under the License.
 		<module>flink-scala</module>
 		<module>flink-filesystems</module>
 		<module>flink-runtime</module>
-		<module>flink-runtime-web</module>
+		<!--<module>flink-runtime-web</module>-->
 		<module>flink-optimizer</module>
 		<module>flink-streaming-java</module>
 		<module>flink-streaming-scala</module>
@@ -90,6 +90,31 @@ under the License.
 		<module>flink-external-resources</module>
 		<module>tools/ci/java-ci-tools</module>
 	</modules>
+
+	<repositories>
+	<repository>
+		<id>central</id>
+		<!-- This should be at top, it makes maven try the central repo first and then others and hence faster dep resolution -->
+		<name>Maven Repository</name>
+		<url>https://repo1.maven.org/maven2</url>
+		<releases>
+			<enabled>true</enabled>
+		</releases>
+		<snapshots>
+			<enabled>false</enabled>
+		</snapshots>
+	</repository>
+	<repository>
+		<id>cloudera</id>
+		<name>cloudera Repository</name>
+		<url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
+	</repository>
+	<repository>
+		<id>alimaven</id>
+		<name>aliyun maven</name>
+		<url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+	</repository>
+	</repositories>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -1010,8 +1035,8 @@ under the License.
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-compiler-plugin</artifactId>
 						<configuration>
-							<source>11</source>
-							<target>11</target>
+							<source>1.8</source>
+							<target>1.8</target>
 							<compilerArgs combine.children="append">
 								<arg>--add-exports=java.base/sun.net.util=ALL-UNNAMED</arg>
 								<arg>--add-exports=java.management/sun.management=ALL-UNNAMED</arg>

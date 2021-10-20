@@ -210,7 +210,8 @@ under the License.
 		<plugins>
 			<plugin>
 				<!-- Extract parser grammar template from calcite-core.jar and put
-                     it under ${project.build.directory} where all freemarker templates are. -->
+                     it under ${project.build.directory} where all freemarker templates are.
+                     从 calcite-core.jar 中提取解析器语法模板并将其放在所有 freemarker 模板所在的 ${project.build.directory} 下。-->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
@@ -235,7 +236,8 @@ under the License.
 					</execution>
 				</executions>
 			</plugin>
-			<!-- adding fmpp code gen -->
+			<!-- adding fmpp code gen
+			添加fmpp 代码生成-->
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<executions>
@@ -284,7 +286,8 @@ under the License.
 				</executions>
 			</plugin>
 			<plugin>
-				<!-- This must be run AFTER the fmpp-maven-plugin -->
+				<!-- This must be run AFTER the fmpp-maven-plugin
+				这必须在 fmpp-maven-plugin 之后运行-->
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>javacc-maven-plugin</artifactId>
 				<version>2.4</version>
@@ -300,7 +303,8 @@ under the License.
 							<includes>
 								<include>**/Parser.jj</include>
 							</includes>
-							<!-- This must be kept synced with Apache Calcite. -->
+							<!-- This must be kept synced with Apache Calcite.
+							这必须与 Apache Calcite 保持同步。-->
 							<lookAhead>1</lookAhead>
 							<isStatic>false</isStatic>
 							<outputDirectory>${project.build.directory}/generated-sources/</outputDirectory>
