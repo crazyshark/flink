@@ -52,11 +52,11 @@ class StreamPlanner(
 
   override protected def getTraitDefs: Array[RelTraitDef[_ <: RelTrait]] = {
     Array(
-      ConventionTraitDef.INSTANCE,
-      FlinkRelDistributionTraitDef.INSTANCE,
-      MiniBatchIntervalTraitDef.INSTANCE,
-      ModifyKindSetTraitDef.INSTANCE,
-      UpdateKindTraitDef.INSTANCE)
+      ConventionTraitDef.INSTANCE,//目前flink优化所处阶段，是logical阶段还是stream_physical阶段
+      FlinkRelDistributionTraitDef.INSTANCE,//数据分布相关trait
+      MiniBatchIntervalTraitDef.INSTANCE,//minibatch相关trait
+      ModifyKindSetTraitDef.INSTANCE,//changelog modify相关trait
+      UpdateKindTraitDef.INSTANCE)//changelog update相关trait
   }
 
   override protected def getOptimizer: Optimizer = new StreamCommonSubGraphBasedOptimizer(this)

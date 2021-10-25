@@ -239,6 +239,22 @@ public class RowDataTest {
         assertArrayEquals(bytes, row.getBinary(15));
         assertEquals(timestamp1, row.getTimestamp(16, 3));
         assertEquals(timestamp2, row.getTimestamp(17, 9));
+
+
+        System.out.println(row.getFloat(5));
+        System.out.println(row.getString(8));
+        ArrayData array = row.getArray(12);
+        int num = array.size();
+        for(int i =0;i<num;i++){
+
+            System.out.println(array.getInt(i));
+        }
+
+        MapData map = row.getMap(13);
+        System.out.println(map.size());
+        System.out.println(map.keyArray().getInt(1));
+        System.out.println(map.valueArray().getInt(1));
+
     }
 
     private void testSetters(RowData row) {
