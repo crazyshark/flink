@@ -51,6 +51,7 @@ class StreamPhysicalConstantTableFunctionScanRule
 
   override def matches(call: RelOptRuleCall): Boolean = {
     val scan: FlinkLogicalTableFunctionScan = call.rel(0)
+    //只有FlinkLogicalTableFunctionScan节点的表达式是由常量组成并且输入是空的时候才会触发规则
     RexUtil.isConstant(scan.getCall) && scan.getInputs.isEmpty
   }
 

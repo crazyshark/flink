@@ -43,6 +43,7 @@ class StreamPhysicalWindowJoinRule
   override def matches(call: RelOptRuleCall): Boolean = {
     val join = call.rel[FlinkLogicalJoin](0)
     //判断FlinkLogicalJoin能否转变为StreamPhysicalWindowJoin
+    //如果连接条件包含窗口开始输入表等式和窗口结束输入表等式为真，否则为假。
     satisfyWindowJoin(join)
   }
 
