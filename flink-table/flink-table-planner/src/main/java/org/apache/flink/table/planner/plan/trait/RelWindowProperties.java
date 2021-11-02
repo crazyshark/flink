@@ -31,7 +31,8 @@ import java.util.Objects;
 import static org.apache.flink.util.Preconditions.checkArgument;
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
-/** It describes the information of window properties of a RelNode. */
+/** It describes the information of window properties of a RelNode.
+ * 用来描述relnode的窗口属性信息 */
 public class RelWindowProperties {
 
     private final ImmutableBitSet windowStartColumns;

@@ -60,8 +60,10 @@ import static org.apache.flink.table.runtime.util.TimeWindowUtil.isWindowFired;
  *
  * <p>Note: currently, {@link WindowJoinOperator} doesn't support early-fire and late-arrival. Thus
  * late elements (elements belong to emitted windows) will be simply dropped.
+ * 注意：目前，{@link WindowJoinOperator} 不支持早到晚到。 因此，后期元素（元素属于发射窗口）将被简单地删除。
  *
  * <p>Note: currently, {@link WindowJoinOperator} doesn't support DELETE or UPDATE_BEFORE input row.
+ * 注意：目前，{@link WindowJoinOperator} 不支持 DELETE 或 UPDATE_BEFORE 输入行。
  */
 public abstract class WindowJoinOperator extends TableStreamOperator<RowData>
         implements TwoInputStreamOperator<RowData, RowData, RowData>,
@@ -144,6 +146,7 @@ public abstract class WindowJoinOperator extends TableStreamOperator<RowData>
         this.windowTimerService = new WindowTimerServiceImpl(internalTimerService, shiftTimeZone);
 
         // init join condition
+        //初始化join condition
         JoinCondition condition =
                 generatedJoinCondition.newInstance(getRuntimeContext().getUserCodeClassLoader());
         this.joinCondition = new JoinConditionWithNullFilters(condition, filterNullKeys, this);
@@ -151,6 +154,7 @@ public abstract class WindowJoinOperator extends TableStreamOperator<RowData>
         this.joinCondition.open(new Configuration());
 
         // init state
+        //初始化状态
         ListStateDescriptor<RowData> leftRecordStateDesc =
                 new ListStateDescriptor<>(LEFT_RECORDS_STATE_NAME, leftSerializer);
         ListState<RowData> leftListState =
@@ -214,40 +218,54 @@ public abstract class WindowJoinOperator extends TableStreamOperator<RowData>
             Meter lateRecordsDroppedRate,
             WindowListState<Long> recordState)
             throws Exception {
+        //获取输入的数据
         RowData inputRow = element.getValue();
+        //获取窗口的结束时间
         long windowEnd = inputRow.getLong(windowEndIndex);
+        //判断窗口是否应在当前进度上触发。就是窗口是否已经触发了
         if (isWindowFired(windowEnd, windowTimerService.currentWatermark(), shiftTimeZone)) {
             // element is late and should be dropped
+            //因为窗口已经触发所以数据迟到了应该被删除
             lateRecordsDroppedRate.markEvent();
             return;
         }
+        //输入的数据类型不是回撤的数据类型
         if (RowDataUtil.isAccumulateMsg(inputRow)) {
+            //将数据加入到state中，注意这里使用windowEnd来区分输入的数据
             recordState.add(windowEnd, inputRow);
         } else {
             // Window join could not handle retraction input stream
+            //window join不能够处理retraction输入流
             throw new UnsupportedOperationException(
                     "This is a bug and should not happen. Please file an issue.");
         }
         // always register time for every element
+        //为每一条数据注册定时器，注册的时间就是数据所在窗口的结束时间
         windowTimerService.registerEventTimeWindowTimer(windowEnd);
     }
 
     @Override
     public void onProcessingTime(InternalTimer<RowData, Long> timer) throws Exception {
         // Window join only support event-time now
+        //窗口join目前只支持事件时间
         throw new UnsupportedOperationException(
                 "This is a bug and should not happen. Please file an issue.");
     }
 
     @Override
     public void onEventTime(InternalTimer<RowData, Long> timer) throws Exception {
+        //设置当前key
         setCurrentKey(timer.getKey());
+        //获取window的Namespace，这里就是windowEnd，用它来区分对应的窗口
         Long window = timer.getNamespace();
         // join left records and right records
+        //从state获取join左右侧的数据
         List<RowData> leftData = leftWindowState.get(window);
         List<RowData> rightData = rightWindowState.get(window);
+        //join数据
         join(leftData, rightData);
         // clear state
+        //清理左右侧的state中的数据
         if (leftData != null) {
             leftWindowState.clear(window);
         }
@@ -349,11 +367,14 @@ public abstract class WindowJoinOperator extends TableStreamOperator<RowData>
 
         @Override
         public void join(Iterable<RowData> leftRecords, Iterable<RowData> rightRecords) {
+            //如果某一侧的数据为空直接返回
             if (leftRecords == null || rightRecords == null) {
                 return;
             }
+            //循环遍历左右侧数据进行join
             for (RowData leftRecord : leftRecords) {
                 for (RowData rightRecord : rightRecords) {
+                    //将数据带入如果满足join condition就返回数据
                     if (joinCondition.apply(leftRecord, rightRecord)) {
                         outRow.setRowKind(RowKind.INSERT);
                         outRow.replace(leftRecord, rightRecord);

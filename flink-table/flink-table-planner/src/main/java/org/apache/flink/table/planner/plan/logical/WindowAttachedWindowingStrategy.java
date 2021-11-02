@@ -29,6 +29,7 @@ import static org.apache.flink.util.Preconditions.checkArgument;
 /**
  * A windowing strategy that gets windows from input columns as windows have been assigned and
  * attached to the physical columns.
+ * 当窗口已分配并附加到物理列时，从输入列获取窗口的窗口化策略。
  */
 @JsonTypeName("WindowAttached")
 public class WindowAttachedWindowingStrategy extends WindowingStrategy {

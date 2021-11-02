@@ -32,20 +32,28 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 
 /**
  * The representation of an edge connecting two {@link ExecNode}s.
+ * 表示一条边用来链接两个ExecNode
  *
  * <p>The edge's json serialization/deserialization will be delegated to {@link JsonPlanEdge}, which
  * only stores the {@link ExecNode}'s id instead of instance.
+ * <p>edge 的 json 序列化/反序列化将委托给 {@link JsonPlanEdge}，它只存储 {@link ExecNode} 的 id 而不是实例。
+ *
  *
  * <p>{@link JsonPlanEdge} should also be updated with this class if the fields are added/removed.
+ * 如果添加/删除字段，<p>{@link JsonPlanEdge} 也应使用此类更新。
  */
 public class ExecEdge {
     /** The source node of this edge. */
+    //这条边的源节点
     private final ExecNode<?> source;
     /** The target node of this edge. */
+    //这条边的目标节点
     private final ExecNode<?> target;
     /** The {@link Shuffle} on this edge from source to target. */
+    //源点到目标点的shuffle信息
     private final Shuffle shuffle;
     /** The {@link StreamExchangeMode} defines the data exchange mode on this edge. */
+    //定义了数据的交换模式
     private final StreamExchangeMode exchangeMode;
 
     public ExecEdge(

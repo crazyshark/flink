@@ -39,6 +39,7 @@ import scala.collection.JavaConverters._
  * The window join requires the join condition contains window starts equality of
  * input tables and window ends equality of input tables.
  * The semantic of window join is the same to the DataStream window join.
+ * 窗口连接要求连接条件包含输入表的窗口开始等式和输入表的窗口结束等式。 窗口连接的语义与 DataStream 窗口连接相同。
  */
 class StreamPhysicalWindowJoin(
     cluster: RelOptCluster,
@@ -105,6 +106,7 @@ class StreamPhysicalWindowJoin(
   }
 
   override def translateToExecNode(): ExecNode[_] = {
+    //获取window join的执行节点
     new StreamExecWindowJoin(
       joinSpec,
       leftWindowing,

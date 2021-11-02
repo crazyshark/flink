@@ -31,16 +31,17 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 /**
  * The {@link WindowJoinOperatorBuilder} is used to build a {@link WindowJoinOperator} for window
  * join.
+ * 用来创建WindowJoinOperator来进行window join的build类
  *
  * <pre>
  * WindowJoinOperatorBuilder.builder()
- *   .leftType(leftType)
- *   .rightType(rightType)
- *   .generatedJoinCondition(generatedJoinCondition)
- *   .leftWindowEndIndex(leftWindowEndIndex)
- *   .rightWindowEndIndex(rightWindowEndIndex)
+ *   .leftType(leftType)//左侧的输出类型
+ *   .rightType(rightType)//右侧的输出类型
+ *   .generatedJoinCondition(generatedJoinCondition)//生成join 的condition代码
+ *   .leftWindowEndIndex(leftWindowEndIndex)//左侧窗口结束列索引
+ *   .rightWindowEndIndex(rightWindowEndIndex)//右侧窗口结束列索引
  *   .filterNullKeys(filterNullKeys)
- *   .joinType(joinType)
+ *   .joinType(joinType)//连接类型
  *   .build();
  * </pre>
  */
@@ -122,7 +123,7 @@ public class WindowJoinOperatorBuilder {
                 String.format(
                         "Illegal window end index %s, it should not be negative!",
                         rightWindowEndIndex));
-
+        //根据join类型建立不同的window join operator
         switch (joinType) {
             case INNER:
                 return new WindowJoinOperator.InnerJoinOperator(

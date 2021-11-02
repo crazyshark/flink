@@ -37,6 +37,7 @@ import scala.collection.JavaConversions._
 
 /**
   * Base physical class for flink [[Join]].
+ * flink join 物理节点的基本类
   */
 abstract class CommonPhysicalJoin(
     cluster: RelOptCluster,

@@ -167,6 +167,7 @@ public class TimeWindowUtil {
 
     /**
      * Returns the window should fired or not on current progress.
+     * 返回窗口是否应在当前进度上触发，就是看窗口是否已经触发
      *
      * @param windowEnd the end of the time window.
      * @param currentProgress current progress of the window operator, it is processing time under
@@ -179,7 +180,9 @@ public class TimeWindowUtil {
         if (windowEnd == Long.MAX_VALUE) {
             return false;
         }
+        //窗口应该触发的时间戳
         long windowTriggerTime = toEpochMillsForTimer(windowEnd - 1, shiftTimeZone);
+        //如果当前时间进度（例如wm）>=窗口触发的时间说明窗口已经触发了
         return currentProgress >= windowTriggerTime;
     }
 

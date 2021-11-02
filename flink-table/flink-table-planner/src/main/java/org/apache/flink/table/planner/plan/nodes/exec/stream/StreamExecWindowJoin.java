@@ -120,32 +120,42 @@ public class StreamExecWindowJoin extends ExecNodeBase<RowData>
     @Override
     @SuppressWarnings("unchecked")
     protected Transformation<RowData> translateToPlanInternal(PlannerBase planner) {
+        //获取左侧窗口结束列的索引
         int leftWindowEndIndex = ((WindowAttachedWindowingStrategy) leftWindowing).getWindowEnd();
+        //获取右侧窗口结束列的索引
         int rightWindowEndIndex = ((WindowAttachedWindowingStrategy) rightWindowing).getWindowEnd();
+        //获取左侧输入流的边
         final ExecEdge leftInputEdge = getInputEdges().get(0);
+        //获取右侧输入流的边
         final ExecEdge rightInputEdge = getInputEdges().get(1);
-
+        //获取左侧输入流的transformation
         final Transformation<RowData> leftTransform =
                 (Transformation<RowData>) leftInputEdge.translateToPlan(planner);
+        //获取右侧输入流的transformation
         final Transformation<RowData> rightTransform =
                 (Transformation<RowData>) rightInputEdge.translateToPlan(planner);
-
+        //获取左侧输入流的数据输出类型
         final RowType leftType = (RowType) leftInputEdge.getOutputType();
+        //获取右侧输入流的数据输出类型
         final RowType rightType = (RowType) rightInputEdge.getOutputType();
         JoinUtil.validateJoinSpec(joinSpec, leftType, rightType, true);
-
+        //获取左侧输入流的join key的位置
         final int[] leftJoinKey = joinSpec.getLeftKeys();
+        //获取右侧输入流的join key 位置
         final int[] rightJoinKey = joinSpec.getRightKeys();
-
+        //
         final InternalTypeInfo<RowData> leftTypeInfo = InternalTypeInfo.of(leftType);
+        //
         final InternalTypeInfo<RowData> rightTypeInfo = InternalTypeInfo.of(rightType);
-
+        //获取tableConfig
         final TableConfig tableConfig = planner.getTableConfig();
+        //生成join 条件代码
         GeneratedJoinCondition generatedCondition =
                 JoinUtil.generateConditionFunction(tableConfig, joinSpec, leftType, rightType);
 
         ZoneId shiftTimeZone =
                 TimeWindowUtil.getShiftTimeZone(leftWindowing.getTimeAttributeType(), tableConfig);
+        //创建WindowJoinOperator，主要的处理逻辑
         WindowJoinOperator operator =
                 WindowJoinOperatorBuilder.builder()
                         .leftSerializer(leftTypeInfo.toRowSerializer())
@@ -157,8 +167,9 @@ public class StreamExecWindowJoin extends ExecNodeBase<RowData>
                         .joinType(joinSpec.getJoinType())
                         .withShiftTimezone(shiftTimeZone)
                         .build();
-
+        //输出的数据类型
         final RowType returnType = (RowType) getOutputType();
+        //创建本节点的Transformation
         final TwoInputTransformation<RowData, RowData, RowData> transform =
                 new TwoInputTransformation<>(
                         leftTransform,
@@ -169,6 +180,7 @@ public class StreamExecWindowJoin extends ExecNodeBase<RowData>
                         leftTransform.getParallelism());
 
         // set KeyType and Selector for state
+        //设置state的KeyType和Selector
         RowDataKeySelector leftSelect =
                 KeySelectorUtil.getRowDataSelector(leftJoinKey, leftTypeInfo);
         RowDataKeySelector rightSelect =

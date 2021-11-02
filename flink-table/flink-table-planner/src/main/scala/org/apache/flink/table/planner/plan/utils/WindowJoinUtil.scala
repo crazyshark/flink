@@ -37,6 +37,7 @@ object WindowJoinUtil extends Logging {
 
   /**
    * Get window properties of left and right child.
+   * 从左侧和右侧的子节点获取window属性
    *
    * @param join input join
    * @return window properties of left and right child.
@@ -49,16 +50,23 @@ object WindowJoinUtil extends Logging {
 
   /**
    * Checks whether join could be translated to windowJoin. it needs satisfy all the following
+   * 检查 join 是否可以转换为 windowJoin。 它需要满足以下所有条件
    * 4 conditions:
+   * 4个条件
    * 1) both two input nodes has window properties
+   * 1) 两个输入节点都有窗口属性
    * 2) time attribute type of left input node is equals to the one of right input node
+   * 2) 左输入节点的时间属性类型等于右输入节点之一
    * 3) window specification of left input node is equals to the one of right input node
+   * 3) 左输入节点的窗口规格等于右输入节点之一
    * 4) join condition contains window starts equality of input tables and window
    * ends equality of input tables
+   * 4) 连接条件包含输入表的窗口开始等式和输入表的窗口结束等式
    *
    * @param join input join
    * @return True if join condition contains window starts equality of input tables and window
    *         ends equality of input tables, else false.
+   *         如果连接条件包含窗口开始输入表等式和窗口结束输入表等式为真，否则为假。
    */
   def satisfyWindowJoin(join: FlinkLogicalJoin): Boolean = {
     excludeWindowStartEqualityAndEndEqualityFromJoinInfoPairs(join) match {
@@ -70,6 +78,7 @@ object WindowJoinUtil extends Logging {
 
   /**
    * Excludes window starts equality and window ends equality from join info.
+   * 从连接信息中排除窗口开始相等和窗口结束相等。
    *
    * @param join a join which could be translated to window join, please see
    *             [[WindowJoinUtil.satisfyWindowJoin()]].
@@ -83,6 +92,14 @@ object WindowJoinUtil extends Logging {
    *         the sixth element is remain right join keys,
    *         the last element is remain join condition which includes remain equal condition and
    *         non-equal condition.
+   *         排除窗口开始等式和窗口结束等式后保留连接信息。
+   *         * 第一个元素是窗口开始相等的左连接键，
+   *         * 第二个元素是窗口结束相等的左连接键，
+   *         * 第三个元素是窗口开始相等的右连接键，
+   *         * 第四个元素是窗口结束相等的右连接键，
+   *         * 第五个元素是保留左连接键，
+   *         * 第六个元素是保留右连接键，
+   *         * 最后一个元素是保持连接条件，包括保持相等条件和不等条件。
    */
   def excludeWindowStartEqualityAndEndEqualityFromWindowJoinCondition(
       join: FlinkLogicalJoin): (
@@ -156,6 +173,7 @@ object WindowJoinUtil extends Logging {
   /**
    * Analyzes input join node. If the join could be translated to windowJoin, excludes window
    * start equality and window end equality from JoinInfo pairs.
+   * 分析输入连接节点。 如果连接可以转换为 windowJoin，则从 JoinInfo 对中排除窗口开始相等和窗口结束相等。
    *
    * @param join  the join to split
    * @return If the join could not translated to window join, the result
@@ -164,6 +182,11 @@ object WindowJoinUtil extends Logging {
    *         2) the second array contains left join keys of window ends equality,
    *         3) the third array contains right join keys of window starts equality,
    *         4) the forth array contains right join keys of window ends equality.
+   *         如果连接无法转换为窗口连接，则结果为 [[Option.empty]]; 否则结果包含一个有 4 个数组的元组。
+   *         * 1) 第一个数组包含窗口开始相等的左连接键，
+   *         * 2) 第二个数组包含窗口结束相等的左连接键，
+   *         * 3) 第三个数组包含窗口开始相等的右连接键，
+   *         * 4) 第四个数组包含窗口结束相等的右连接键。
    */
   private def excludeWindowStartEqualityAndEndEqualityFromJoinInfoPairs(
       join: FlinkLogicalJoin): Option[(Array[Int], Array[Int], Array[Int], Array[Int])] = {

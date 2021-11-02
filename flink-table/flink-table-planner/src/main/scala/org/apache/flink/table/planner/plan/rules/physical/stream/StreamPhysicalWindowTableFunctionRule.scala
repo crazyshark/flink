@@ -46,9 +46,11 @@ class StreamPhysicalWindowTableFunctionRule  extends ConverterRule(
 
   def convert(rel: RelNode): RelNode = {
     val scan: FlinkLogicalTableFunctionScan = rel.asInstanceOf[FlinkLogicalTableFunctionScan]
+    //设置目标trait
     val traitSet: RelTraitSet = rel.getTraitSet.replace(FlinkConventions.STREAM_PHYSICAL)
+    //生成一个新的带有目标triat的节点并添加到优化器上
     val newInput = RelOptRule.convert(scan.getInput(0), FlinkConventions.STREAM_PHYSICAL)
-
+    //创建WindowTableFunction物理节点
     new StreamPhysicalWindowTableFunction(
       scan.getCluster,
       traitSet,

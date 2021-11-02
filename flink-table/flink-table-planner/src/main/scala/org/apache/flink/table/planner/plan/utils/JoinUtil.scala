@@ -48,11 +48,13 @@ import scala.collection.JavaConversions._
 
 /**
   * Util for [[Join]]s.
+ * join的工具类
   */
 object JoinUtil {
 
   /**
    * Create [[JoinSpec]] according to the given join.
+   * 通过给定的join创建JoinSpec，用来描述join
    */
   def createJoinSpec(join: Join): JoinSpec = {
     val filterNulls = new util.ArrayList[java.lang.Boolean]

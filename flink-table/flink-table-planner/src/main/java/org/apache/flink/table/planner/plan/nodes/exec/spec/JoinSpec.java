@@ -36,13 +36,18 @@ import java.util.Optional;
 
 /**
  * JoinSpec describes how two tables will be joined.
+ * JoinSpec描述两个表如何join
  *
  * <p>This class corresponds to {@link org.apache.calcite.rel.core.Join} rel node.
+ * 此类对应于 {@link org.apache.calcite.rel.core.Join} rel 节点。
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class JoinSpec {
+    //join类型
     public static final String FIELD_NAME_JOIN_TYPE = "joinType";
+    //左侧连接key
     public static final String FIELD_NAME_LEFT_KEYS = "leftKeys";
+    //右侧连接key
     public static final String FIELD_NAME_RIGHT_KEYS = "rightKeys";
     public static final String FIELD_NAME_FILTER_NULLS = "filterNulls";
     public static final String FIELD_NAME_NON_EQUI_CONDITION = "nonEquiCondition";

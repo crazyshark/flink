@@ -59,6 +59,8 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
  * the input relation. The return value of the new relation includes all the original columns as
  * well additional 3 columns named {@code window_start}, {@code window_end}, {@code window_time} to
  * indicate the assigned window.
+ * Stream {@link ExecNode} 充当表值函数，为输入关系的每一行分配一个窗口。
+ * 新关系的返回值包括所有原始列以及名为 {@code window_start}、{@code window_end}、{@code window_time} 的额外 3 列以指示分配的窗口。
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StreamExecWindowTableFunction extends ExecNodeBase<RowData>
@@ -104,11 +106,14 @@ public class StreamExecWindowTableFunction extends ExecNodeBase<RowData>
 
     @Override
     protected Transformation<RowData> translateToPlanInternal(PlannerBase planner) {
+        //获取输入节点的边
         final ExecEdge inputEdge = getInputEdges().get(0);
+        //获取输入数据的类型
         final RowType inputRowType = (RowType) inputEdge.getOutputType();
+        //获取输入字段名
         String[] inputFieldNames = inputRowType.getFieldNames().toArray(new String[0]);
         String windowSummary = windowingStrategy.toSummaryString(inputFieldNames);
-
+        //如果不是提交每一条数据咋要报异常
         if (!emitPerRecord) {
             throw new TableException(
                     String.format(
@@ -122,16 +127,20 @@ public class StreamExecWindowTableFunction extends ExecNodeBase<RowData>
         } else if (!windowingStrategy.isRowtime()) {
             throw new TableException("Processing time Window TableFunction is not supported yet.");
         }
+        //获取输入节点的Transformation
         final Transformation<RowData> inputTransform =
                 (Transformation<RowData>) inputEdge.translateToPlan(planner);
         WindowSpec windowSpec = windowingStrategy.getWindow();
+        //创建窗口分配器
         WindowAssigner<TimeWindow> windowAssigner = createWindowAssigner(windowSpec);
         final ZoneId shiftTimeZone =
                 TimeWindowUtil.getShiftTimeZone(
                         windowingStrategy.getTimeAttributeType(), planner.getTableConfig());
+        //创建operator，主要操作逻辑在这里面
         WindowTableFunctionOperator windowTableFunctionOperator =
                 new WindowTableFunctionOperator(
                         windowAssigner, windowingStrategy.getTimeAttributeIndex(), shiftTimeZone);
+        //生成本节点的Transformation
         return new OneInputTransformation<>(
                 inputTransform,
                 getDescription(),
