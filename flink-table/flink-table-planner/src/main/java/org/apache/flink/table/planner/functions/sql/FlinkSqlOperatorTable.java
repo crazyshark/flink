@@ -54,19 +54,29 @@ import static org.apache.flink.table.planner.plan.type.FlinkReturnTypes.ARG0_VAR
 import static org.apache.flink.table.planner.plan.type.FlinkReturnTypes.STR_MAP_NULLABLE;
 import static org.apache.flink.table.planner.plan.type.FlinkReturnTypes.VARCHAR_2000_NULLABLE;
 
-/** Operator table that contains only Flink-specific functions and operators. */
+/** Operator table that contains only Flink-specific functions and operators.
+ * 这个表中只包含flink特定的functions和operators
+ * */
 public class FlinkSqlOperatorTable extends ReflectiveSqlOperatorTable {
 
-    /** The table of contains Flink-specific operators. */
+    /** The table of contains Flink-specific operators.
+     * 这个table中保存了flink特定的operators
+     * */
     private static FlinkSqlOperatorTable instance;
 
-    /** Returns the Flink operator table, creating it if necessary. */
+    /** Returns the Flink operator table, creating it if necessary.
+     * 在需要的时候返回flink 的operator table
+     * */
     public static synchronized FlinkSqlOperatorTable instance() {
         if (instance == null) {
             // Creates and initializes the standard operator table.
             // Uses two-phase construction, because we can't initialize the
             // table until the constructor of the sub-class has completed.
+            //创建并初始化标准运算符表。 使用两阶段构造，因为在子类的构造函数完成之前我们无法初始化表。
             instance = new FlinkSqlOperatorTable();
+            //调用父类ReflectiveSqlOperatorTable中的init方法初始化，
+            // 最终将定义的function通过反射保存到父类的caseSensitiveOperators,caseInsensitiveOperators
+            //中，最终在lookupOperatorOverloads调用父类的lookupOperatorOverloads，从上面两个map中进行查找
             instance.init();
         }
         return instance;
@@ -104,6 +114,7 @@ public class FlinkSqlOperatorTable extends ReflectiveSqlOperatorTable {
 
     // -----------------------------------------------------------------------------
     // Flink specific built-in scalar SQL functions
+    // flink中定义的扩展sql functions
     // -----------------------------------------------------------------------------
 
     // FUNCTIONS
@@ -979,7 +990,7 @@ public class FlinkSqlOperatorTable extends ReflectiveSqlOperatorTable {
             SESSION_OLD.auxiliary("SESSION_PROCTIME", SqlKind.OTHER_FUNCTION);
 
     // -----------------------------------------------------------------------------
-    // operators extend from Calcite
+    // operators extend from Calcite   从calcite扩展的operators
     // -----------------------------------------------------------------------------
 
     // SET OPERATORS
@@ -1177,6 +1188,8 @@ public class FlinkSqlOperatorTable extends ReflectiveSqlOperatorTable {
     // use the definitions in Flink, because we have different return types
     // and special check on the time attribute.
     // SESSION is not supported yet, because Calcite doesn't support PARTITION BY clause in TVF
+    //WINDOW TABLE FUNCTIONS 使用 Flink 中的定义，因为我们有不同的返回类型和对时间属性的特殊检查。
+    // 尚不支持 SESSION，因为 Calcite 不支持 TVF 中的 PARTITION BY 子句
     public static final SqlOperator DESCRIPTOR = new SqlDescriptorOperator();
     public static final SqlFunction TUMBLE = new SqlTumbleTableFunction();
     public static final SqlFunction HOP = new SqlHopTableFunction();

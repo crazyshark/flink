@@ -52,6 +52,7 @@ object WindowUtil {
 
   /**
    * Returns true if the grouping keys contain window_start and window_end properties.
+   * 如果分区键包含window_start 和 window_end 返回true
    */
   def groupingContainsWindowStartEnd(
       grouping: ImmutableBitSet,
@@ -69,6 +70,7 @@ object WindowUtil {
 
   /**
    * Returns true if the [[RexNode]] is a window table-valued function call.
+   * 如果RexNode是一个window tvf 调用就返回true
    */
   def isWindowTableFunctionCall(node: RexNode): Boolean = node match {
     case call: RexCall => call.getOperator.isInstanceOf[SqlWindowTableFunction]
@@ -77,6 +79,7 @@ object WindowUtil {
 
   /**
    * Returns true if expressions in [[Calc]] contain calls on window columns.
+   * 如果 [[Calc]] 中的表达式包含对窗口列的调用，则返回 true。
    */
   def calcContainsCallsOnWindowColumns(calc: Calc, fmq: FlinkRelMetadataQuery): Boolean = {
     val calcInput = calc.getInput
@@ -101,12 +104,18 @@ object WindowUtil {
   /**
    * Builds a new RexProgram on the input of window-tvf to exclude window columns,
    * but include time attribute.
+   * 在 window-tvf 的输入上构建一个新的 RexProgram 以排除窗口列，但包括时间属性。
    *
    * The return tuple consists of 4 elements:
    * (1) the new RexProgram
    * (2) the field index shifting
    * (3) the new index of time attribute on the new RexProgram
    * (4) whether the time attribute is new added
+   * * 返回元组由 4 个元素组成：
+   * * (1) 新的 RexProgram
+   * * (2) 字段索引移位
+   * * (3) 新RexProgram上时间属性的新索引
+   * * (4) 时间属性是否新增
    */
   def buildNewProgramWithoutWindowColumns(
       rexBuilder: RexBuilder,
@@ -167,6 +176,7 @@ object WindowUtil {
   /**
    * Converts a [[RexCall]] into [[TimeAttributeWindowingStrategy]], the [[RexCall]] must be a
    * window table-valued function call.
+   * 将 [[RexCall]] 转换为 [[TimeAttributeWindowingStrategy]]，[[RexCall]] 必须是窗口表值函数调用。
    */
   def convertToWindowingStrategy(
       windowCall: RexCall,
@@ -189,6 +199,7 @@ object WindowUtil {
     }
 
     val windowFunction = windowCall.getOperator.asInstanceOf[SqlWindowTableFunction]
+    //
     val windowSpec = windowFunction match {
       case FlinkSqlOperatorTable.TUMBLE =>
         val offset: Duration = if (windowCall.operands.size() == 4) {
@@ -226,6 +237,7 @@ object WindowUtil {
   /**
    * Window TVF based aggregations don't support early-fire and late-fire,
    * throws exception when the configurations are set.
+   * 基于窗口 TVF 的聚合不支持早启动和晚启动，在设置配置时抛出异常。
    */
   def checkEmitConfiguration(tableConfig: TableConfig): Unit = {
     val conf = tableConfig.getConfiguration
