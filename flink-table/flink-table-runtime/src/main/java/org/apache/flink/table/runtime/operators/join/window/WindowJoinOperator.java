@@ -240,7 +240,8 @@ public abstract class WindowJoinOperator extends TableStreamOperator<RowData>
                     "This is a bug and should not happen. Please file an issue.");
         }
         // always register time for every element
-        //为每一条数据注册定时器，注册的时间就是数据所在窗口的结束时间
+        //为每一条数据注册定时器，注册的时间就是数据所在窗口的结束时间，
+        //也就是说这个定时器在窗口结束的时候会触发
         windowTimerService.registerEventTimeWindowTimer(windowEnd);
     }
 
@@ -259,10 +260,10 @@ public abstract class WindowJoinOperator extends TableStreamOperator<RowData>
         //获取window的Namespace，这里就是windowEnd，用它来区分对应的窗口
         Long window = timer.getNamespace();
         // join left records and right records
-        //从state获取join左右侧的数据
+        //从state获取join左右侧的数据，这里就是在窗口结束的时候获取窗口中的全部内容
         List<RowData> leftData = leftWindowState.get(window);
         List<RowData> rightData = rightWindowState.get(window);
-        //join数据
+        //join左右窗口中的数据
         join(leftData, rightData);
         // clear state
         //清理左右侧的state中的数据

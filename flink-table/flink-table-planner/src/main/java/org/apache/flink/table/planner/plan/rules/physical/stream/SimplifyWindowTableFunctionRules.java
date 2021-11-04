@@ -36,6 +36,8 @@ import java.util.List;
  * Planner rule that tries to simplify emit behavior of {@link StreamPhysicalWindowTableFunction} to
  * emit per record instead of emit after watermark passed window end if time attribute is event-time
  * and followed by {@link StreamPhysicalWindowRank} or {@link StreamPhysicalWindowJoin}.
+ * 如果时间属性是事件时间且后跟 {@link StreamPhysicalWindowRank} 或 {@link StreamPhysicalWindowJoin}，
+ * 则规划器规则试图简化 {@link StreamPhysicalWindowTableFunction} 的emit数据行为，发送每条数据，而不是在窗口结束的时候才发送。
  */
 public interface SimplifyWindowTableFunctionRules {
     SimplifyWindowTableFunctionWithWindowRankRule WITH_WINDOW_RANK =
@@ -61,14 +63,19 @@ abstract class SimplifyWindowTableFunctionRuleBase extends RelOptRule {
     /**
      * Replace the leaf node, and build a new {@link RelNode} tree in the given nodes order which is
      * in root-down direction.
+     * 替换叶子节点，并按照给定的节点顺序构建一个新的 {@link RelNode} 树，该树在根向下的方向上。
      */
     protected RelNode rebuild(List<RelNode> nodes) {
+        //获取windowTVF
         final StreamPhysicalWindowTableFunction windowTVF =
                 (StreamPhysicalWindowTableFunction) nodes.get(nodes.size() - 1);
+        //如果windowTVF的window是事件时间，并且发送数据不是每条发送
         if (needSimplify(windowTVF)) {
+            //将windowTVF的emitPerRecord从原来默认的false设置为true
             RelNode root = windowTVF.copy(true);
             for (int i = nodes.size() - 2; i >= 0; i--) {
                 RelNode node = nodes.get(i);
+                //将新的windowTVF节点传给原来的父节点
                 root = node.copy(node.getTraitSet(), Collections.singletonList(root));
             }
             return root;
@@ -79,6 +86,8 @@ abstract class SimplifyWindowTableFunctionRuleBase extends RelOptRule {
 
     protected boolean needSimplify(StreamPhysicalWindowTableFunction windowTVF) {
         // excludes windowTVF which is already simplified to emit by per record
+        // 排除 windowTVF 已经简化为按记录发出
+        //window是事件时间，并且发送数据不是每条发送
         return windowTVF.windowing().isRowtime() && !windowTVF.emitPerRecord();
     }
 }
@@ -150,14 +159,17 @@ abstract class SimplifyWindowTableFunctionWithWindowJoinRuleBase
         List<RelNode> rels = call.getRelList();
         final StreamPhysicalWindowTableFunction rightWindowTVF =
                 (StreamPhysicalWindowTableFunction) rels.get(rels.size() - 1);
+        //如果join左右输入WindowTVF的window是事件时间，并且发送数据不是每条发送那么这条规则就可以使用
         return needSimplify(leftWindowTVF) || needSimplify(rightWindowTVF);
     }
 
     @Override
     public void onMatch(RelOptRuleCall call) {
+        //获取join节点
         final StreamPhysicalWindowJoin join = call.rel(0);
         final RelNode newLeft = buildNewLeftTree(call);
         final RelNode newRight = buildNewRightTree(call);
+        //使用新的左右输入节点创建新的join节点
         final RelNode newJoin =
                 join.copy(
                         join.getTraitSet(),
@@ -166,6 +178,7 @@ abstract class SimplifyWindowTableFunctionWithWindowJoinRuleBase
                         newRight,
                         join.getJoinType(),
                         join.isSemiJoinDone());
+        //注册到优化器上
         call.transformTo(newJoin);
     }
 

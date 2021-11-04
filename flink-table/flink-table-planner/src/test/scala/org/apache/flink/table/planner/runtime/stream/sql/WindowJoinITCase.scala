@@ -148,6 +148,27 @@ class WindowJoinITCase(mode: StateBackendMode, useTimestampLtz: Boolean)
         |) R
         |ON L.window_start = R.window_start AND L.window_end = R.window_end AND L.`name` = R.`name`
         |""".stripMargin
+    /*val sql =
+      """
+        |SELECT L.`name`, L.window_start, L.window_end
+        |FROM (
+        |SELECT
+        |  `name`,
+        |  window_start,
+        |  window_end
+        |FROM TABLE(
+        |   TUMBLE(TABLE T1, DESCRIPTOR(rowtime1), INTERVAL '5' SECOND))
+        |) L
+        |JOIN (
+        |SELECT
+        |  `name`,
+        |  window_start,
+        |  window_end
+        |FROM TABLE(
+        |   TUMBLE(TABLE T2, DESCRIPTOR(rowtime2), INTERVAL '5' SECOND))
+        |) R
+        |ON  L.`name` = R.`name`
+        |""".stripMargin*/
 
     /*val sink = new TestingAppendSink
     tEnv.sqlQuery(sql).toAppendStream[Row].addSink(sink)
