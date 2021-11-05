@@ -100,6 +100,7 @@ public class WindowJoinOperatorBuilder {
      * The shift timezone of the window, if the proctime or rowtime type is TIMESTAMP_LTZ, the shift
      * timezone is the timezone user configured in TableConfig, other cases the timezone is UTC
      * which means never shift when assigning windows.
+     * 窗口的移位时区，如果proctime或rowtime类型为TIMESTAMP_LTZ，则移位时区为用户在TableConfig中配置的时区，其他情况时区为UTC，即分配窗口时永不移位。
      */
     public WindowJoinOperatorBuilder withShiftTimezone(ZoneId shiftTimeZone) {
         this.shiftTimeZone = shiftTimeZone;
