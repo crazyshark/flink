@@ -471,12 +471,15 @@ public abstract class WindowJoinOperator extends TableStreamOperator<RowData>
 
         @Override
         public void join(Iterable<RowData> leftRecords, Iterable<RowData> rightRecords) {
+            //对于左外连接如果左侧流没有数据那么返回不处理
             if (leftRecords == null) {
                 return;
             }
+            //对于左外连接如果右侧数据为null那么发送（左行数据，null)
             if (rightRecords == null) {
                 outputNullPadding(leftRecords, true);
             } else {
+                //循环join数据
                 for (RowData leftRecord : leftRecords) {
                     boolean matches = false;
                     for (RowData rightRecord : rightRecords) {
@@ -485,6 +488,7 @@ public abstract class WindowJoinOperator extends TableStreamOperator<RowData>
                             matches = true;
                         }
                     }
+                    //如果左行数据没有join上就要发送（左行数据，null)
                     if (!matches) {
                         // padding null for left side
                         outputNullPadding(leftRecord, true);
