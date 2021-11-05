@@ -181,25 +181,28 @@ object WindowUtil {
   def convertToWindowingStrategy(
       windowCall: RexCall,
       inputRowType: RelDataType): TimeAttributeWindowingStrategy = {
+    //检查windowCall是不是window TVF
     if (!isWindowTableFunctionCall(windowCall)) {
       throw new IllegalArgumentException(s"RexCall $windowCall is not a window table-valued " +
         "function, can't convert it into WindowingStrategy")
     }
-
+    //获取时间的列的索引
     val timeIndex = getTimeAttributeIndex(windowCall.operands(1))
+    //获取字段的类型
     val fieldType = inputRowType.getFieldList.get(timeIndex).getType
     if (!FlinkTypeFactory.isTimeIndicatorType(fieldType)) {
       throw new ValidationException("Window can only be defined on a time attribute column, " +
         "but is type of " + fieldType)
     }
+    //时间属性的类型，类如事件时间
     val timeAttributeType = FlinkTypeFactory.toLogicalType(fieldType)
     if (!canBeTimeAttributeType(timeAttributeType)) {
       throw new ValidationException("The supported time indicator type are TIMESTAMP" +
         " and TIMESTAMP_LTZ, but is " + FlinkTypeFactory.toLogicalType(fieldType) + "")
     }
-
+    //获取windowFunction
     val windowFunction = windowCall.getOperator.asInstanceOf[SqlWindowTableFunction]
-    //
+    //根据windowFunction的类型获取窗口的信息
     val windowSpec = windowFunction match {
       case FlinkSqlOperatorTable.TUMBLE =>
         val offset: Duration = if (windowCall.operands.size() == 4) {
@@ -221,6 +224,7 @@ object WindowUtil {
         new HoppingWindowSpec(Duration.ofMillis(size), Duration.ofMillis(slide), offset)
 
       case FlinkSqlOperatorTable.CUMULATE =>
+        //
         val offset = if (windowCall.operands.size() == 5) {
           Duration.ofMillis(getOperandAsLong(windowCall.operands(4)))
         } else {
@@ -230,7 +234,6 @@ object WindowUtil {
         val maxSize = getOperandAsLong(windowCall.operands(3))
         new CumulativeWindowSpec(Duration.ofMillis(maxSize), Duration.ofMillis(step), offset)
     }
-
     new TimeAttributeWindowingStrategy(windowSpec, timeAttributeType, timeIndex)
   }
 

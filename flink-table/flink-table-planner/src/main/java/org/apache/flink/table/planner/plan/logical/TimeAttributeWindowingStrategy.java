@@ -26,7 +26,9 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonTyp
 
 import static org.apache.flink.util.Preconditions.checkArgument;
 
-/** A windowing strategy that gets windows by calculating on time attribute column. */
+/** A windowing strategy that gets windows by calculating on time attribute column.
+ * 通过计算时间属性列来获取窗口的窗口策略。
+ * */
 @JsonTypeName("TimeAttribute")
 public class TimeAttributeWindowingStrategy extends WindowingStrategy {
     public static final String FIELD_NAME_TIME_ATTRIBUTE_INDEX = "timeAttributeIndex";

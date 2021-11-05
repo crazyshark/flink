@@ -30,7 +30,8 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonTyp
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-/** Logical representation of a windowing strategy. */
+/** Logical representation of a windowing strategy.
+ * 窗口策略的逻辑表示。*/
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "strategy")
 @JsonSubTypes({
     @JsonSubTypes.Type(value = TimeAttributeWindowingStrategy.class),
